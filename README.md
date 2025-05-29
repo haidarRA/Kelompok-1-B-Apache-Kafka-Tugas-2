@@ -112,7 +112,7 @@ Struktur directory untuk tugas / project ini adalah sebagai berikut.
    Endpoint ini menggunakan model 2 berfungsi untuk memprediksi nilai high dan low dari Bitcoin. Parameter yang diterima endpoint ini adalah **open** dan **volume**.
    ![Screenshot 2025-05-29 201514](https://github.com/user-attachments/assets/dcad9fa3-d0d9-42fd-9912-27524061a1bc)
 
-   c. **/predict/model3**
+   c. **/predict/trend**
    
    Endpoint ini menggunakan model 3 berfungsi untuk memprediksi tren Bitcoin (naik atau turun). Parameter yang diterima endpoint ini adalah **open**, **close**, dan **volume**.
    ![Screenshot 2025-05-29 201706](https://github.com/user-attachments/assets/f4472516-f8e1-409f-bb14-110a6ef192aa)
