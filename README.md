@@ -102,17 +102,17 @@ Struktur directory untuk tugas / project ini adalah sebagai berikut.
    
 5. Jalankan program `api.py` untuk membuat endpoint API untuk ketiga model. Program ini menggunakan Flask agar bisa berjalan. Untuk endpointnya yang ada adalah sebagai berikut.
 
-   a. **/predict/model1**
+   a. **/predict/close**
 
-   Endpoint ini berfungsi untuk memprediksi harga close dari Bitcoin. Parameter yang diterima endpoint ini adalah **timestamp**. Hasil dari prediksi model ini adalah harga close Bitcoin dalam USD.
-   ![Screenshot 2025-05-29 150205](https://github.com/user-attachments/assets/45ba051f-30b9-48ae-8ded-448fd372cd3d)
+   Endpoint ini menggunakan model 1 berfungsi untuk memprediksi harga close dari Bitcoin. Parameter yang diterima endpoint ini adalah **timestamp**. Hasil dari prediksi model ini adalah harga close Bitcoin dalam USD.
+   ![Screenshot 2025-05-29 201325](https://github.com/user-attachments/assets/04b5a415-bebe-4d7f-a348-c1ccb0465a6c)
 
-   b. **/predict/model2**
+   b. **/predict/high_low**
    
-   Endpoint ini berfungsi untuk memprediksi nilai high dan low dari Bitcoin. Parameter yang diterima endpoint ini adalah **open** dan **volume**.
-   ![Screenshot 2025-05-29 150114](https://github.com/user-attachments/assets/851110dc-e32e-484f-8278-23aaeab80501)
+   Endpoint ini menggunakan model 2 berfungsi untuk memprediksi nilai high dan low dari Bitcoin. Parameter yang diterima endpoint ini adalah **open** dan **volume**.
+   ![Screenshot 2025-05-29 201514](https://github.com/user-attachments/assets/dcad9fa3-d0d9-42fd-9912-27524061a1bc)
 
    c. **/predict/model3**
    
-   Endpoint ini berfungsi untuk memprediksi tren Bitcoin (naik atau turun). Parameter yang diterima endpoint ini adalah **open**, **close**, dan **volume**.
-   ![Screenshot 2025-05-29 150922](https://github.com/user-attachments/assets/3bd2b44c-b58f-4235-a1bb-76e48b6f1261)
+   Endpoint ini menggunakan model 3 berfungsi untuk memprediksi tren Bitcoin (naik atau turun). Parameter yang diterima endpoint ini adalah **open**, **close**, dan **volume**.
+   ![Screenshot 2025-05-29 201706](https://github.com/user-attachments/assets/f4472516-f8e1-409f-bb14-110a6ef192aa)
