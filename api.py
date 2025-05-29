@@ -21,7 +21,7 @@ models = {
     "model3": LogisticRegressionModel.load(str(model3_dir)),
 }
 
-@app.route('/predict/model1', methods=['GET'])
+@app.route('/predict/close', methods=['GET'])
 def predict_model1():
     timestamp = int(request.args.get('timestamp'))
     
@@ -34,7 +34,7 @@ def predict_model1():
         "predicted_close": pred_close
     })
 
-@app.route('/predict/model2', methods=['GET'])
+@app.route('/predict/high_low', methods=['GET'])
 def predict_model2():
     open_val = float(request.args.get('open'))
     volume = float(request.args.get('volume'))
@@ -53,7 +53,7 @@ def predict_model2():
         "predicted_low": pred_low
     })
 
-@app.route('/predict/model3', methods=['GET'])
+@app.route('/predict/trend', methods=['GET'])
 def predict_model3():
     open_val = float(request.args.get('open'))
     close_val = float(request.args.get('close'))
