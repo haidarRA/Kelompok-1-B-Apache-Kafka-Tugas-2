@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Prediction Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .model-card {
+            margin-bottom: 20px;
+        }
+
+        .model-title {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .predict-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .predict-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-card.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .result-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1rem;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Bitcoin Prediction Dashboard</h1>
+            <p>Advanced ML Models for Bitcoin Price Analysis</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('model1')">Model 1: Price Prediction</button>
+            <button class="tab-button" onclick="switchTab('model2')">Model 2: High/Low Prediction</button>
+            <button class="tab-button" onclick="switchTab('model3')">Model 3: Trend Analysis</button>
+        </div>
+
+        <!-- Model 1 Tab -->
+        <div id="model1" class="tab-content active">
+            <div class="model-card">
+                <h2 class="model-title">📈 Price Prediction Model</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 25px;">Predict Bitcoin closing price based on timestamp</p>
+                
+                <div class="form-group">
+                    <label for="timestamp">Timestamp (Unix)</label>
+                    <input type="number" id="timestamp" placeholder="e.g., 2051200800" value="2051200800">
+                </div>
+
+                <button class="predict-button" onclick="predictModel1()">Predict Close Price</button>
+
+                <div id="loading1" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    Processing prediction...
+                </div>
+
+                <div id="result1" class="result-card">
+                    <div class="result-title">Prediction Result:</div>
+                    <div id="result1-content"></div>
+                </div>
+
+                <div id="error1" class="error"></div>
+            </div>
+        </div>
+
+        <!-- Model 2 Tab -->
+        <div id="model2" class="tab-content">
+            <div class="model-card">
+                <h2 class="model-title">📊 High/Low Prediction Model</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 25px;">Predict Bitcoin high and low prices based on opening price and volume</p>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="open">Opening Price ($)</label>
+                        <input type="number" id="open" placeholder="e.g., 45000" value="45000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="volume">Volume</label>
+                        <input type="number" id="volume" placeholder="e.g., 1000000" value="1000000">
+                    </div>
+                </div>
+
+                <button class="predict-button" onclick="predictModel2()">Predict High/Low Prices</button>
+
+                <div id="loading2" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    Processing prediction...
+                </div>
+
+                <div id="result2" class="result-card">
+                    <div class="result-title">Prediction Results:</div>
+                    <div id="result2-content"></div>
+                </div>
+
+                <div id="error2" class="error"></div>
+            </div>
+        </div>
+
+        <!-- Model 3 Tab -->
+        <div id="model3" class="tab-content">
+            <div class="model-card">
+                <h2 class="model-title">📈📉 Trend Analysis Model</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 25px;">Predict Bitcoin price trend (Up/Down) based on market data</p>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="open3">Opening Price ($)</label>
+                        <input type="number" id="open3" placeholder="e.g., 45000" value="45000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="close3">Closing Price ($)</label>
+                        <input type="number" id="close3" placeholder="e.g., 46000" value="46000" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="volume3">Volume</label>
+                    <input type="number" id="volume3" placeholder="e.g., 1000000" value="1000000">
+                </div>
+
+                <button class="predict-button" onclick="predictModel3()">Analyze Trend</button>
+
+                <div id="loading3" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    Analyzing trend...
+                </div>
+
+                <div id="result3" class="result-card">
+                    <div class="result-title">Trend Analysis Result:</div>
+                    <div id="result3-content"></div>
+                </div>
+
+                <div id="error3" class="error"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:5001';
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        async function predictModel1() {
+            const timestamp = document.getElementById('timestamp').value;
+            
+            if (!timestamp) {
+                showError('error1', 'Please enter a timestamp');
+                return;
+            }
+
+            showLoading('loading1', true);
+            hideResult('result1');
+            hideError('error1');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/predict/model1?timestamp=${timestamp}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('result1-content').innerHTML = `
+                        <div class="result-value">$${data.predicted_close.toFixed(2)}</div>
+                        <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+                        <p><strong>Date:</strong> ${new Date(data.timestamp * 1000).toLocaleString()}</p>
+                    `;
+                    showResult('result1');
+                } else {
+                    showError('error1', 'Error: ' + (data.error || 'Prediction failed'));
+                }
+            } catch (error) {
+                showError('error1', 'Network error: ' + error.message);
+            } finally {
+                showLoading('loading1', false);
+            }
+        }
+
+        async function predictModel2() {
+            const open = document.getElementById('open').value;
+            const volume = document.getElementById('volume').value;
+            
+            if (!open || !volume) {
+                showError('error2', 'Please enter both opening price and volume');
+                return;
+            }
+
+            showLoading('loading2', true);
+            hideResult('result2');
+            hideError('error2');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/predict/model2?open=${open}&volume=${volume}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('result2-content').innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <p><strong>Predicted High:</strong></p>
+                                <div class="result-value" style="color: #27ae60;">$${data.predicted_high.toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <p><strong>Predicted Low:</strong></p>
+                                <div class="result-value" style="color: #e74c3c;">$${data.predicted_low.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><strong>Range:</strong> $${(data.predicted_high - data.predicted_low).toFixed(2)}</p>
+                        <p><strong>Input:</strong> Open: $${data.open}, Volume: ${data.volume.toLocaleString()}</p>
+                    `;
+                    showResult('result2');
+                } else {
+                    showError('error2', 'Error: ' + (data.error || 'Prediction failed'));
+                }
+            } catch (error) {
+                showError('error2', 'Network error: ' + error.message);
+            } finally {
+                showLoading('loading2', false);
+            }
+        }
+
+        async function predictModel3() {
+            const open = document.getElementById('open3').value;
+            const close = document.getElementById('close3').value;
+            const volume = document.getElementById('volume3').value;
+            
+            if (!open || !close || !volume) {
+                showError('error3', 'Please enter all required fields');
+                return;
+            }
+
+            showLoading('loading3', true);
+            hideResult('result3');
+            hideError('error3');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/predict/model3?open=${open}&close=${close}&volume=${volume}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const isUp = data.predicted_trend === 'Up';
+                    const trendColor = isUp ? '#27ae60' : '#e74c3c';
+                    const trendIcon = isUp ? '📈' : '📉';
+                    
+                    document.getElementById('result3-content').innerHTML = `
+                        <div style="text-align: center;">
+                            <div class="result-value" style="color: ${trendColor}; font-size: 2rem;">
+                                ${trendIcon} ${data.predicted_trend}
+                            </div>
+                            <p style="margin-top: 15px;"><strong>Analysis:</strong> The trend is predicted to go <strong>${data.predicted_trend.toLowerCase()}</strong></p>
+                        </div>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+                            <p><strong>Input Data:</strong></p>
+                            <p>Open: $${data.open} | Close: $${data.close} | Volume: ${data.volume.toLocaleString()}</p>
+                        </div>
+                    `;
+                    showResult('result3');
+                } else {
+                    showError('error3', 'Error: ' + (data.error || 'Prediction failed'));
+                }
+            } catch (error) {
+                showError('error3', 'Network error: ' + error.message);
+            } finally {
+                showLoading('loading3', false);
+            }
+        }
+
+        function showLoading(loadingId, show) {
+            document.getElementById(loadingId).style.display = show ? 'block' : 'none';
+        }
+
+        function showResult(resultId) {
+            document.getElementById(resultId).classList.add('show');
+        }
+
+        function hideResult(resultId) {
+            document.getElementById(resultId).classList.remove('show');
+        }
+
+        function showError(errorId, message) {
+            const errorEl = document.getElementById(errorId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideError(errorId) {
+            document.getElementById(errorId).style.display = 'none';
+        }
+
+        // Add Enter key support for inputs
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab-content.active').id;
+                if (activeTab === 'model1') predictModel1();
+                else if (activeTab === 'model2') predictModel2();
+                else if (activeTab === 'model3') predictModel3();
+            }
+        });
+    </script>
+</body>
+</html>
