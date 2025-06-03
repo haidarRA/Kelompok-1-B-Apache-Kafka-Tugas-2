@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS
 from pyspark.ml.regression import LinearRegressionModel, RandomForestRegressionModel
 from pyspark.ml.classification import LogisticRegressionModel
 from pyspark.ml.feature import VectorAssembler
@@ -7,6 +8,8 @@ from pyspark.ml.linalg import Vectors
 from pathlib import Path
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+
 spark = SparkSession.builder.appName("BitcoinAPI").getOrCreate()
 
 model1_dir = Path(__file__).resolve().parent / 'model' / 'model1'
@@ -75,4 +78,4 @@ def predict_model3():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5001)
